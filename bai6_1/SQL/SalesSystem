@@ -1,0 +1,71 @@
+
+USE SalesDB;
+GO
+
+IF OBJECT_ID('ChiTietHoaDon', 'U') IS NOT NULL DROP TABLE ChiTietHoaDon;
+IF OBJECT_ID('HoaDon', 'U') IS NOT NULL DROP TABLE HoaDon;
+IF OBJECT_ID('SanPham', 'U') IS NOT NULL DROP TABLE SanPham;
+IF OBJECT_ID('KhachHang', 'U') IS NOT NULL DROP TABLE KhachHang;
+IF OBJECT_ID('NhanVien', 'U') IS NOT NULL DROP TABLE NhanVien;
+GO
+
+CREATE TABLE NhanVien (
+    MaNV INT PRIMARY KEY IDENTITY(1,1),
+    TenNV NVARCHAR(100) NOT NULL,
+    SoDienThoai VARCHAR(15) UNIQUE,
+    ChucVu NVARCHAR(50)
+);
+
+CREATE TABLE KhachHang (
+    MaKH INT PRIMARY KEY IDENTITY(1,1),
+    TenKH NVARCHAR(100) NOT NULL,
+    DienThoai VARCHAR(15) UNIQUE,
+    DiemTichLuy INT DEFAULT 0 CHECK (DiemTichLuy >= 0)
+);
+
+CREATE TABLE SanPham (
+    MaSP VARCHAR(20) PRIMARY KEY,
+    TenSP NVARCHAR(150) NOT NULL,
+    GiaBan DECIMAL(18,2) CHECK (GiaBan > 0),
+    SoLuongTon INT CHECK (SoLuongTon >= 0)
+);
+
+CREATE TABLE HoaDon (
+    MaHD INT PRIMARY KEY IDENTITY(1,1),
+    NgayLap DATETIME DEFAULT GETDATE(),
+    MaNV INT,
+    MaKH INT NULL,
+    TongTien DECIMAL(18,2) CHECK (TongTien >= 0),
+    FOREIGN KEY (MaNV) REFERENCES NhanVien(MaNV),
+    FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH)
+);
+
+CREATE TABLE ChiTietHoaDon (
+    MaHD INT,
+    MaSP VARCHAR(20),
+    SoLuong INT CHECK (SoLuong > 0),
+    DonGia DECIMAL(18,2) CHECK (DonGia > 0),
+    PRIMARY KEY (MaHD, MaSP),
+    FOREIGN KEY (MaHD) REFERENCES HoaDon(MaHD) ON DELETE CASCADE,
+    FOREIGN KEY (MaSP) REFERENCES SanPham(MaSP)
+);
+
+INSERT INTO NhanVien VALUES
+(N'Nguyễn Thị Thu', '0912345678', N'Thu ngân'),
+(N'Trần Văn Nam', '0987654321', N'Quản lý'),
+(N'Lê Thị Mai', '0905556666', N'Thu ngân');
+
+INSERT INTO KhachHang VALUES
+(N'Nguyễn Văn An', '0901112222', 50),
+(N'Lê Thị Bình', '0903334444', 120),
+(N'Trần Văn Cường', '0907778888', 0);
+
+INSERT INTO SanPham VALUES
+('SP001', N'Nước ngọt 500ml', 10000.00, 100),
+('SP002', N'Bánh mì thịt', 15000.00, 50),
+('SP003', N'Sữa tươi hộp', 8000.00, 200),
+('SP004', N'Kẹo socola', 25000.00, 30),
+('SP005', N'Bánh quy gói', 12000.00, 80);
+SELECT * FROM SanPham;
+SELECT * FROM NhanVien;
+SELECT * FROM KhachHang;
